@@ -10,6 +10,6 @@ resource "aws_s3_bucket" "this" {
   tags = merge(var.additional_tags,
     {
       Type          = "S3",
-      BackupEnabled = "${var.enable_backup}",
+      BackupEnabled = "${var.enable_backup}"
     })
 }
