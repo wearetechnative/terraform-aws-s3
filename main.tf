@@ -11,6 +11,5 @@ resource "aws_s3_bucket" "this" {
     {
       Type          = "S3",
       BackupEnabled = "${var.enable_backup}",
-      BackupEnabled = locals.backup
-  })
+    })
 }
