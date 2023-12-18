@@ -90,3 +90,9 @@ variable "lifecycle_configuration" {
   }))
   default = {}
 }
+
+variable "enable_backup" {
+  description = "Enable aws backups using the tags define"
+  type        = bool
+  default     = true
+}

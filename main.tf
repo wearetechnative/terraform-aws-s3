@@ -7,5 +7,10 @@ resource "aws_s3_bucket" "this" {
     prevent_destroy = true
   }
 
-  tags = var.additional_tags
+  tags = merge(var.additional_tags,
+    {
+      Type          = "RDS",
+      BackupEnabled = "${var.enable_backup}",
+      BackupEnabled = locals.backup
+  })
 }
