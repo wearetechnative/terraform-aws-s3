@@ -22,13 +22,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
         }
 
-        dynamic "noncurrent_version_expiration" {
-            for_each = rule.value.noncurrent_version_expiration == null ? {} : rule.value.noncurrent_version_expiration
-            content {
-                newer_noncurrent_versions = rule.value.noncurrent_version_expiration.newer_noncurrent_versions
-                noncurrent_days = rule.value.noncurrent_version_expiration.noncurrent_days
-
-            }
+        noncurrent_version_expiration {
+            newer_noncurrent_versions = rule.value.noncurrent_version_expiration.newer_noncurrent_versions == null ? null : rule.value.noncurrent_version_expiration.newer_noncurrent_versions
+            noncurrent_days = rule.value.noncurrent_version_expiration.noncurrent_days == null ? null : rule.value.noncurrent_version_expiration.noncurrent_days
         }
 
         dynamic "noncurrent_version_transition" {
