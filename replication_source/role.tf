@@ -1,5 +1,5 @@
 module "replication_role" {
-  source = "github.com/wearetechnative/terraform-aws-iam-role?ref=0fe916c27097706237692122e09f323f55e8237e"
+  source = "github.com/wearetechnative/terraform-aws-iam-role?ref=9229bbd0280807cbc49f194ff6d2741265dc108a"
 
   role_name = var.role_name
   role_path = var.role_path
