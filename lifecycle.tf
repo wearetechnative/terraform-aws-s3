@@ -38,6 +38,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
         expiration {
             days = rule.value.expiration_days == "0" ? null : rule.value.expiration_days # must be tested.
+            expired_object_delete_marker = rule.value.expired_object_delete_marker == null ? null : rule.value.expired_object_delete_marker
         }
 
         dynamic "abort_incomplete_multipart_upload" {
