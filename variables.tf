@@ -87,6 +87,9 @@ variable "lifecycle_configuration" {
         noncurrent_days = number
         storage_class = string
     })
+    abort_incomplete_multipart_upload = object({
+        days_after_initiation = number
+    })
   }))
   default = {}
 }
