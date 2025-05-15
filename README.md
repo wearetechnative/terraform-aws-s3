@@ -1,4 +1,4 @@
-# Terraform AWS [S3] ![](https://img.shields.io/github/workflow/status/wearetechnative/terraform-aws-s3/tflint.yaml?style=plastic)
+# Terraform AWS [S3] ![](https://img.shields.io/github/workflow/status/wearetechnative/terraform-aws-s3/tflint.yaml?branch=main&style=plastic)
 
 Standard S3 module that enforces KMS encryption. Use principal based policies to access this bucket if possible.
 
