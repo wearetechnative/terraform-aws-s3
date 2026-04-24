@@ -15,13 +15,13 @@ variable "source_kms_key_arn" {
 variable "role_name" {
   # Defined within s3 module so we can output without an active replication configuration, this makes the setup easier.
   description = "Role name for replication setup."
-  type = string
+  type        = string
 }
 
 variable "role_path" {
   # Defined within s3 module so we can output without an active replication configuration, this makes the setup easier.
   description = "Role name for replication setup."
-  type = string
+  type        = string
 }
 
 variable "source_replication_configuration" {

@@ -71,28 +71,55 @@ variable "target_replication_configuration" {
 variable "lifecycle_configuration" {
   description = "Object Lifecycle rules configuration."
   type = map(object({
-    status = string
+    status        = string
     bucket_prefix = string
     transition = object({
-      storage_class = string
+      storage_class   = string
       transition_days = number
     })
     expiration_days = object({
-      days = number
+      days                         = number
       expired_object_delete_marker = bool
     })
     noncurrent_version_expiration = object({
-        newer_noncurrent_versions = number
-        noncurrent_days = number
+      newer_noncurrent_versions = number
+      noncurrent_days           = number
     })
     noncurrent_version_transition = object({
-        newer_noncurrent_versions = number
-        noncurrent_days = number
-        storage_class = string
+      newer_noncurrent_versions = number
+      noncurrent_days           = number
+      storage_class             = string
     })
     abort_incomplete_multipart_upload = object({
-        days_after_initiation = number
+      days_after_initiation = number
     })
   }))
   default = {}
+}
+
+variable "cors_rules" {
+  description = "CORS configuration rules for the S3 bucket. Allows web browsers to make cross-origin requests to the bucket. Each rule specifies allowed origins, methods, and headers."
+  type = list(object({
+    allowed_headers = list(string)
+    allowed_methods = list(string)
+    allowed_origins = list(string)
+    expose_headers  = optional(list(string))
+    max_age_seconds = optional(number)
+  }))
+  default = []
+
+  validation {
+    condition     = length(var.cors_rules) <= 100
+    error_message = "AWS S3 supports a maximum of 100 CORS rules per bucket."
+  }
+
+  validation {
+    condition = alltrue([
+      for rule in var.cors_rules : alltrue([
+        for method in rule.allowed_methods :
+        contains(["GET", "PUT", "POST", "DELETE", "HEAD"], method)
+      ])
+    ])
+    error_message = "allowed_methods must only contain: GET, PUT, POST, DELETE, HEAD."
+  }
 }

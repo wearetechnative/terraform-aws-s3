@@ -24,7 +24,7 @@ output "website_regional_domain" {
 
 output "replication_target_bucket_arguments" {
   value = {
-    "source_role_arn": "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.id}:role/${local.s3_replication_role_path}${local.s3_replication_role_name}"
+    "source_role_arn" : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.id}:role/${local.s3_replication_role_path}${local.s3_replication_role_name}"
   }
 }
 

@@ -4,14 +4,14 @@ locals {
 }
 
 module "replication_source" {
-  count = length([ for k, v in var.source_replication_configuration : k ]) > 0 ? 1 : 0
-  source   = "./replication_source"
+  count  = length([for k, v in var.source_replication_configuration : k]) > 0 ? 1 : 0
+  source = "./replication_source"
 
-  name                    = var.name
-  role_name = local.s3_replication_role_name
-  role_path = local.s3_replication_role_path
-  source_bucket_arn       = aws_s3_bucket.this.arn
-  source_kms_key_arn      = var.kms_key_arn
+  name                             = var.name
+  role_name                        = local.s3_replication_role_name
+  role_path                        = local.s3_replication_role_path
+  source_bucket_arn                = aws_s3_bucket.this.arn
+  source_kms_key_arn               = var.kms_key_arn
   source_replication_configuration = var.source_replication_configuration
 }
 
