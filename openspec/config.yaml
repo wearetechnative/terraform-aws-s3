@@ -1,0 +1,153 @@
+schema: spec-driven
+
+# Project context
+# This is shown to AI when creating artifacts.
+context: |
+  ## Project: Terraform AWS S3 Module
+
+  **Type**: Public Terraform module for creating secure AWS S3 buckets
+  **Primary use case**: Security-focused S3 buckets with enforced encryption
+
+  ### Tech Stack
+  - Terraform >= 4.8.0 (AWS provider)
+  - Sub-modules: replication_source, replication_target
+  - CI/CD: tflint, tfsec
+
+  ### Security Philosophy
+  - Security by default, convenience as opt-in
+  - Encryption always (KMS preferred, SSE-S3 as fallback)
+  - Public access is explicit opt-in only
+  - TLS 1.2+ enforced
+  - prevent_destroy lifecycle enabled
+
+  ### Module Patterns
+  - One resource per file (current structure)
+  - Data sources for IAM policy documents
+  - Sub-modules for complex features (replication)
+  - SSM parameters for bucket name discovery (/s3/${var.name}/id)
+  - Bucket naming: prefix pattern with auto-generated suffix (unless use_fixed_name=true)
+
+  ### Supported Workflows
+  1. **Private bucket** (default): var.name + var.kms_key_arn
+  2. **Public bucket**: var.name + var.kms_key_arn + var.enable_public_read_access=true + var.use_sse-s3_encryption_instead_of_sse-kms=true
+
+  ### Documentation
+  - README.md uses terraform-docs (<!-- BEGIN_TF_DOCS --> markers)
+  - All variables must have descriptions
+  - Mark "Internal use only" variables clearly
+  - CHANGELOG.md follows Keep a Changelog format with "## NEXT VERSION" section
+
+  ### Versioning & Releases
+  - No semantic versioning currently used
+  - This is a library module consumed by other Terraform projects
+  - Breaking changes should be avoided or clearly communicated
+
+# Per-artifact rules
+rules:
+  # Global rules for all artifacts
+  global:
+    - "Never implement changes that break backwards compatibility without explicit approval"
+    - "All security-related changes must maintain or improve security posture"
+    - "Document the 'why' not just the 'what'"
+
+  proposal:
+    - "Clearly identify if change is breaking or non-breaking"
+    - "For breaking changes: document migration path"
+    - "Consider impact on both public and private bucket workflows"
+    - "Include security implications section"
+
+  design:
+    - "Follow existing file organization pattern (one resource per file)"
+    - "Use data sources for IAM policy documents, not inline policies"
+    - "Document which variables are 'internal use only'"
+    - "Consider sub-module composition for complex features"
+
+  tasks:
+    - "All Terraform changes must pass tflint and tfsec"
+    - "Run 'terraform fmt' before committing"
+    - "Update terraform-docs sections in README.md"
+    - "Update CHANGELOG.md under '## NEXT VERSION' section"
+    - "If adding variables: ensure descriptions are clear and security implications documented"
+
+  # Security guardrails (CRITICAL - never violate)
+  security:
+    - "NEVER allow unencrypted S3 buckets"
+    - "NEVER remove prevent_destroy lifecycle"
+    - "NEVER weaken TLS requirements (must be >= 1.2)"
+    - "NEVER make public access the default"
+    - "NEVER bypass encryption enforcement policies without explicit var.disable_encryption_enforcement check"
+    - "Always validate KMS key ARN when using SSE-KMS"
+    - "Public buckets must use SSE-S3 (not KMS) due to AWS limitations"
+
+  # Terraform best practices
+  terraform:
+    - "Maintain AWS provider compatibility (currently >= 4.8.0)"
+    - "Use count for conditional resources (not for_each)"
+    - "Use source_policy_documents for merging policies"
+    - "Keep complex expressions in locals"
+    - "Avoid nested conditionals > 2 levels deep"
+    - "All resource names should use 'this' for single-instance resources"
+    - "Use snake_case for all identifiers"
+
+  # Documentation standards
+  documentation:
+    - "All variables MUST have description field"
+    - "Mark internal-only variables: 'Internal use only.' prefix in description"
+    - "Document security implications in variable descriptions"
+    - "Keep terraform-docs markers (<!-- BEGIN_TF_DOCS -->) intact"
+    - "Update CHANGELOG.md for user-facing changes"
+    - "Use Keep a Changelog format with ### Added, ### Changed, ### Fixed sections"
+
+  # Testing requirements
+  testing:
+    - "tflint must pass (see .github/workflows/tflint.yaml)"
+    - "tfsec must pass (see .github/workflows/tfsec-tfinit.yaml)"
+    - "terraform fmt -check must pass"
+    - "No integration tests currently - focus on static analysis"
+
+  # Module-specific rules
+  module:
+    - "Sub-modules (replication_source, replication_target) must remain independent"
+    - "Use output-to-input pattern for configuring replication"
+    - "All sub-modules should have examples/ directory with usage examples"
+    - "Bucket names: replace underscores with hyphens"
+    - "SSM parameter naming: /s3/${var.name}/id pattern"
+    - "Replication roles: use consistent naming with local.s3_replication_role_*"
+
+  # Code quality
+  quality:
+    - "One resource per file (follow existing pattern)"
+    - "Use descriptive resource and data source names"
+    - "Keep policy documents in separate data sources"
+    - "Use comments for complex logic, not obvious code"
+    - "Module outputs should match AWS resource attributes when possible"
+
+# Additional context for AI agents
+conventions:
+  file_naming:
+    - "main.tf: primary S3 bucket resource"
+    - "variables.tf: input variables"
+    - "outputs.tf: module outputs"
+    - "kms.tf: encryption configuration"
+    - "bucket_policy.tf: IAM policies and ownership controls"
+    - "public_access_block.tf: public access settings"
+    - "versioning.tf: bucket versioning"
+    - "lifecycle.tf: lifecycle rules"
+    - "replication.tf: replication module calls"
+    - "ssm_parameter.tf: SSM parameter for bucket name"
+    - "data.tf: data sources (caller identity, partition)"
+    - "versions.tf: provider version constraints"
+
+  variable_patterns:
+    - "enable_* for boolean flags"
+    - "use_* for mode switches"
+    - "disable_* for negative flags (use sparingly)"
+    - "*_configuration for complex objects (maps/lists)"
+    - "additional_* for optional additive parameters"
+
+  security_layers:
+    - "Encryption: SSE-KMS (default) or SSE-S3 (public buckets)"
+    - "Access: Public access block (default deny)"
+    - "Transport: TLS 1.2+ enforcement"
+    - "Policy: Multi-layer deny policies for encryption enforcement"
+    - "Lifecycle: prevent_destroy to avoid accidental deletion"
