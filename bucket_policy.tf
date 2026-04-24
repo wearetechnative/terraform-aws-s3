@@ -22,10 +22,10 @@ data "aws_iam_policy_document" "this" {
       "Statement" : [for v in var.bucket_policy_addition.Statement : merge(v, { "Resource" : [for s in flatten(concat([v.Resource], [])) : replace(s, "<bucket>", aws_s3_bucket.this.arn)] })]
       "Version" : lookup(var.bucket_policy_addition, "Version", null) != null ? var.bucket_policy_addition.Version : "2012-10-17"
     })] : []
-    , [data.aws_iam_policy_document.deny_unencrypted_objectaccess.json]
+    , data.aws_iam_policy_document.deny_unencrypted_objectaccess[*].json
     , data.aws_iam_policy_document.public_read_access[*].json
     , [data.aws_iam_policy_document.dummy_policy.json]
-    , [data.aws_iam_policy_document.deny_obsolete_tls.json]
+    , data.aws_iam_policy_document.deny_obsolete_tls[*].json
     , [for k, v in module.replication_target : v.resource_policy_addition]
   )
 }
@@ -72,6 +72,8 @@ data "aws_iam_policy_document" "public_read_access" {
 }
 
 data "aws_iam_policy_document" "deny_unencrypted_objectaccess" {
+  count = var.enable_public_read_access ? 0 : 1
+
   statement {
     sid = "Prevent always deny unencrypted object access if applicable"
 
@@ -205,6 +207,8 @@ data "aws_iam_policy_document" "deny_unencrypted_sse" {
 # while old TLS is still possible, do a 'smoketest' to see if we run into trouble this will allow us to at least control the moment of enforcement and asses impact before AWS makes that decision
 # https://repost.aws/knowledge-center/s3-enforce-modern-tls
 data "aws_iam_policy_document" "deny_obsolete_tls" {
+  count = var.enable_public_read_access ? 0 : 1
+
   statement {
     sid = "DenyObsoleteTLS"
 
