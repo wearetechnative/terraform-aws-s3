@@ -12,6 +12,7 @@ variable "use_fixed_name" {
 variable "kms_key_arn" {
   description = "KMS key to use for encrypting S3 bucket."
   type        = string
+  default     = null
 }
 
 variable "bucket_policy_addition" {
