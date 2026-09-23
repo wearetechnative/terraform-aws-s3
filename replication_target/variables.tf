@@ -1,5 +1,6 @@
 variable "name" {
   description = "Replication name"
+  type        = string
 }
 
 variable "destination_bucket_arn" {
